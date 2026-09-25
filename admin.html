@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Caja - Mi Negocio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4 font-sans">
+
+  <main class="w-full max-w-md bg-gray-800 rounded-3xl shadow-xl p-6 text-center border border-gray-700">
+    <h1 class="text-xl font-bold text-yellow-400 mb-1">--- CAJA / ADMIN ---</h1>
+    <p class="text-xs text-gray-400 mb-6">Ingresa el celular del cliente para sumar puntos</p>
+
+    <!-- Buscar Cliente -->
+    <div class="space-y-4 mb-6">
+      <input id="admin-phone" type="tel" placeholder="Número Celular" class="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-center text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+      <button onclick="buscarClienteAdmin()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-xl shadow-md transition">
+        Buscar Cliente
+      </button>
+    </div>
+
+    <!-- Info y Botón de Sumar Estrella -->
+    <div id="admin-card" class="hidden space-y-4 pt-4 border-t border-gray-700">
+      <h2 id="cliente-nombre" class="text-lg font-bold"></h2>
+      <p id="cliente-puntos" class="text-sm text-yellow-400 font-semibold"></p>
+
+      <button onclick="sumarEstrella()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-lg transition">
+        ➕ Agregar +1 Punto
+      </button>
+
+      <button onclick="canjearPremioAdmin()" id="btn-canjear" class="hidden w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-lg transition">
+        🎁 Canjear Premio (Reiniciar a 0)
+      </button>
+    </div>
+  </main>
+
+<script>
+  const SUPABASE_URL = 'https://rkrtcsezfxmxnrxwgtgd.supabase.co';
+  const SUPABASE_KEY = 'PEGA_AQUI_TU_CLAVE_PUBLISHABLE';
+
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  let clienteEncontrado = null;
+
+  async function buscarClienteAdmin() {
+    const tel = document.getElementById('admin-phone').value.trim();
+    if (!tel) return alert('Ingresa un número de teléfono');
+
+    const { data, error } = await db.from('clientes').select('*').eq('telefono', tel).maybeSingle();
+
+    if (error) return alert('Error al buscar: ' + error.message);
+    if (!data) return alert('El cliente no está registrado aún.');
+
+    clienteEncontrado = data;
+    actualizarVistaAdmin();
+  }
+
+  function actualizarVistaAdmin() {
+    document.getElementById('admin-card').classList.remove('hidden');
+    document.getElementById('cliente-nombre').textContent = clienteEncontrado.nombre || 'Cliente Registrado';
+    document.getElementById('cliente-puntos').textContent = `Puntos actuales: ${clienteEncontrado.estrellas || 0} / 5`;
+
+    const btnCanjear = document.getElementById('btn-canjear');
+    if ((clienteEncontrado.estrellas || 0) >= 5) {
+      btnCanjear.classList.remove('hidden');
+    } else {
+      btnCanjear.classList.add('hidden');
+    }
+  }
+
+  async function sumarEstrella() {
+    if (!clienteEncontrado) return;
+    const nuevosPuntos = (clienteEncontrado.estrellas || 0) + 1;
+
+    const { data, error } = await db.from('clientes').update({ estrellas: nuevosPuntos }).eq('id', clienteEncontrado.id).select().single();
+
+    if (error) return alert('Error: ' + error.message);
+    clienteEncontrado = data;
+    actualizarVistaAdmin();
+    alert('✅ ¡+1 Punto agregado correctamente!');
+  }
+
+  async function canjearPremioAdmin() {
+    if (!clienteEncontrado) return;
+    const { data, error } = await db.from('clientes').update({ estrellas: 0 }).eq('id', clienteEncontrado.id).select().single();
+
+    if (error) return alert('Error: ' + error.message);
+    clienteEncontrado = data;
+    actualizarVistaAdmin();
+    alert('🎉 Premio canjeado. Los puntos volvieron a 0.');
+  }
+</script>
+</body>
+</html>
