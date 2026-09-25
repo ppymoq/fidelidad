@@ -54,85 +54,63 @@
     </button>
   </section>
 
-  <script>
-    // --- REEMPLAZA CON TUS DATOS DE SUPABASE ---
-    const SUPABASE_URL = 'https://tencujhgrbzruxikqljq.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrcnRjc2V6ZnhteG5yeHdndGdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMTA5ODcsImV4cCI6MjEwNTg4Njk4N30.3HTK3ddlnVdHcnaMYr3g4vlpWvNd9gkGyn04rrCLDuA';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+ <!-- Cargar la librería de Supabase (OBLIGATORIO) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    let clienteActual = null;
+<script>
+  // --- CONFIGURACIÓN DE SUPABASE ---
+  const SUPABASE_URL = 'https://tencujhgrbzruxikqljq.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlbmN1amhncmJ6cnV4aWtxbGpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjcwODcwMDksImV4cCI6MjA0MjY2MzAwOX0.S0o0_G8...'; // Tu clave completa
+  
+  // Inicialización del cliente
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    async function buscarOBuscarCliente() {
-      const tel = document.getElementById('phone-input').value.trim();
-      if (!tel) return alert('Ingresa un número de celular');
+  let clienteActual = null;
 
-      // Buscar cliente en BD
-      let { data, error } = await supabase.from('clientes').select('*').eq('telefono', tel).single();
+  async function buscarOBuscarCliente() {
+    const telInput = document.getElementById('phone-input');
+    if (!telInput) return alert('No se encontró el campo de teléfono');
+    
+    const tel = telInput.value.trim();
+    if (!tel) return alert('Ingresa un número de celular');
 
-      if (!data) {
-        // Si no existe, lo crea automáticamente
-        const nuevo = await supabase.from('clientes').insert([{ telefono: tel, estrellas: 0 }]).select().single();
-        data = nuevo.data;
-      }
-
-      clienteActual = data;
-      mostrarTarjeta();
-    }
-
-    function mostrarTarjeta() {
-      document.getElementById('login-section').classList.add('hidden');
-      document.getElementById('card-section').classList.remove('hidden');
-      document.getElementById('user-phone').textContent = `Cliente: ${clienteActual.telefono}`;
-      
-      const count = clienteActual.estrellas;
-      document.getElementById('star-count').textContent = count;
-      
-      const container = document.getElementById('stars-container');
-      container.innerHTML = '';
-      for (let i = 1; i <= 5; i++) {
-        const span = document.createElement('span');
-        span.className = `text-4xl ${i <= count ? 'text-yellow-400 scale-110' : 'text-gray-300'}`;
-        span.innerHTML = '★';
-        container.appendChild(span);
-      }
-
-      if (count >= 5) {
-        document.getElementById('reward-banner').classList.remove('hidden');
-      } else {
-        document.getElementById('reward-banner').classList.add('hidden');
-      }
-    }
-
-    async function marcarConsumoAdmin() {
-      if (!clienteActual) return alert('Primero busca o ingresa un cliente');
-      if (clienteActual.estrellas >= 5) return alert('El cliente ya llegó a las 5 estrellas');
-
-      const nuevasEstrellas = clienteActual.estrellas + 1;
-      const { data, error } = await supabase
+    try {
+      // 1. Buscar si el cliente ya existe
+      let { data, error } = await supabase
         .from('clientes')
-        .update({ estrellas: nuevasEstrellas })
-        .eq('id', clienteActual.id)
-        .select()
-        .single();
+        .select('*')
+        .eq('telefono', tel)
+        .maybeSingle();
 
-      if (!error) {
-        clienteActual = data;
-        mostrarTarjeta();
+      if (error) throw error;
+
+      // 2. Si no existe, crearlo
+      if (!data) {
+        const { data: nuevo, error: createError } = await supabase
+          .from('clientes')
+          .insert([{ telefono: tel, estrellas: 0 }])
+          .select()
+          .single();
+
+        if (createError) throw createError;
+        data = nuevo;
       }
-    }
 
-    async function canjearPremio() {
-      const { data } = await supabase.from('clientes').update({ estrellas: 0 }).eq('id', clienteActual.id).select().single();
+      // 3. Mostrar la tarjeta con los datos del cliente
       clienteActual = data;
-      alert('¡Premio canjeado! Contador reiniciado.');
       mostrarTarjeta();
-    }
 
-    function cerrarSesion() {
-      clienteActual = null;
-      document.getElementById('card-section').classList.add('hidden');
-      document.getElementById('login-section').classList.remove('hidden');
+    } catch (err) {
+      console.error(err);
+      alert('Error al conectar: ' + err.message);
     }
-  </script>
+  }
+
+  function mostrarTarjeta() {
+    document.getElementById('login-section').classList.add('hidden');
+    document.getElementById('card-section').classList.remove('hidden');
+    document.getElementById('user-phone').textContent = `Cliente: ${clienteActual.telefono}`;
+  }
+</script>
 </body>
 </html>
