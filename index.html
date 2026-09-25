@@ -59,19 +59,16 @@
   </section>
 
 <script>
+  // URL y Llave vinculadas a tu proyecto Fidelidad PPY
   const SUPABASE_URL = 'https://rkrtcsezfxmxnrxwgtgd.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrcnRjc2V6ZnhteG5yeHdndGdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMTA5ODcsImV4cCI6MjA0MjY2MzAwOX0.3HTK3ddlnVdHcnaMYr3g4vlpWvNd9gkGyn04rrCLDuA';
   
-  let supabase = null;
-  if (window.supabase) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
-
+  const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
   let clienteActual = null;
 
   async function buscarOBuscarCliente() {
     if (!supabase) {
-      return alert('Error: No se pudo cargar la librería de Supabase. Revisa tu conexión.');
+      return alert('No se pudo conectar con Supabase. Por favor refresca la página.');
     }
 
     const telInput = document.getElementById('phone-input');
@@ -108,8 +105,8 @@
       mostrarTarjeta();
 
     } catch (err) {
-      console.error('Detalle del error:', err);
-      alert('Error de conexión o estructura en Supabase:\n' + (err.message || JSON.stringify(err)));
+      console.error(err);
+      alert('Aviso de conexión: ' + (err.message || 'Error al conectar con la base de datos'));
     } finally {
       btn.disabled = false;
       btn.textContent = 'Entrar / Consultar Puntos';
@@ -120,7 +117,6 @@
     document.getElementById('login-section').classList.add('hidden');
     document.getElementById('card-section').classList.remove('hidden');
     document.getElementById('user-phone').textContent = `Cliente: ${clienteActual.telefono}`;
-    
     actualizarVistaEstrellas();
   }
 
@@ -148,7 +144,7 @@
 
   async function marcarConsumoAdmin() {
     if (!clienteActual) {
-      return alert('Primero debes consultar un cliente con su número de celular.');
+      return alert('Primero debes ingresar un número de cliente arriba.');
     }
 
     const nuevasEstrellas = (clienteActual.estrellas || 0) + 1;
@@ -165,9 +161,8 @@
 
       clienteActual = data;
       actualizarVistaEstrellas();
-      alert(`¡+1 Estrella agregada a ${clienteActual.telefono}!`);
     } catch (err) {
-      alert('Error al actualizar estrellas:\n' + (err.message || JSON.stringify(err)));
+      alert('Error al actualizar estrellas: ' + err.message);
     }
   }
 
@@ -186,9 +181,9 @@
 
       clienteActual = data;
       actualizarVistaEstrellas();
-      alert('🎉 ¡Premio canjeado con éxito! La tarjeta se ha reiniciado.');
+      alert('🎉 ¡Premio canjeado con éxito!');
     } catch (err) {
-      alert('Error al canjear premio:\n' + (err.message || JSON.stringify(err)));
+      alert('Error al canjear premio: ' + err.message);
     }
   }
 
