@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fidelidad Mi Negocio</title>
+  
+  <!-- Configuración de PWA / App Instalable -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4F46E5">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Fidelidad">
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- SDK de Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -17,7 +26,7 @@
 
   <main class="w-full max-w-md bg-white rounded-3xl shadow-xl p-6 my-auto text-center border border-gray-100">
     
-    <!-- Login / Registro con Nombre y Teléfono -->
+    <!-- Login / Registro -->
     <div id="login-section" class="space-y-4">
       <h2 class="text-lg font-semibold text-gray-700">Ingresa tus Datos</h2>
       
@@ -57,8 +66,13 @@
   </section>
 
 <script>
+  // Registrar Service Worker para permitir instalación como App
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('Error SW:', err));
+  }
+
   const SUPABASE_URL = 'https://rkrtcsezfxmxnrxwgtgd.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrcnRjc2V6ZnhteG5yeHdndGdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMTA5ODcsImV4cCI6MjEwNTg4Njk4N30.3HTK3ddlnVdHcnaMYr3g4vlpWvNd9gkGyn04rrCLDuA'; 
+  const SUPABASE_KEY = 'PEGA_AQUI_TU_CLAVE_PUBLISHABLE'; 
 
   let db = null;
   if (window.supabase) {
@@ -83,7 +97,6 @@
     btn.textContent = 'Verificando...';
 
     try {
-      // 1. Buscar si el cliente ya existe por su teléfono
       let { data, error } = await db
         .from('clientes')
         .select('*')
@@ -91,7 +104,6 @@
 
       if (error) throw error;
 
-      // 2. Si no existe, crearlo con su nombre y celular
       if (!data || data.length === 0) {
         if (!nombre) {
           alert('Por favor ingresa tu nombre para registrarte.');
@@ -109,7 +121,6 @@
         clienteActual = nuevoCliente[0];
       } else {
         clienteActual = data[0];
-        // Si ya existía pero no tenía nombre guardado y escribió uno nuevo, actualizarlo
         if (nombre && !clienteActual.nombre) {
           await db.from('clientes').update({ nombre: nombre }).eq('id', clienteActual.id);
           clienteActual.nombre = nombre;
