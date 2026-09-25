@@ -7,10 +7,10 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#4F46E5">
   
-  <!-- Cargar Tailwind CSS para los estilos y colores -->
+  <!-- ESTO ES LO QUE LE DA EL DISEÑO Y COLOR (Tailwind CSS) -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Cargar SDK de Supabase -->
+  <!-- SDK de Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-between p-4 font-sans">
@@ -61,8 +61,7 @@
 <script>
   // --- CONFIGURACIÓN DE SUPABASE ---
   const SUPABASE_URL = 'https://tencujhgrbzruxikqljq.supabase.co';
-  // IMPORTANTE: Asegúrate de pegar aquí la llave anon public COMPLETA de tu panel de Supabase
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlbmN1amhncmJ6cnV4aWtxbGpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjcwODcwMDksImV4cCI6MjA0MjY2MzAwOX0.S0o0_G8...';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlbmN1amhncmJ6cnV4aWtxbGpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjcwODcwMDksImV4cCI6MjA0MjY2MzAwOX0.S0o0_G8...'; // Asegúrate de que aquí esté tu clave anon public completa
   
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -74,7 +73,6 @@
     if (!tel) return alert('Ingresa un número de celular');
 
     try {
-      // 1. Buscar si el cliente existe
       let { data, error } = await supabase
         .from('clientes')
         .select('*')
@@ -83,7 +81,6 @@
 
       if (error) throw error;
 
-      // 2. Si no existe, crearlo
       if (!data) {
         const { data: nuevo, error: createError } = await supabase
           .from('clientes')
@@ -116,7 +113,6 @@
     const estrellas = clienteActual.estrellas || 0;
     document.getElementById('star-count').textContent = estrellas;
 
-    // Renderizar iconos de estrellas (llenas / vacías)
     const container = document.getElementById('stars-container');
     container.innerHTML = '';
     for (let i = 1; i <= 5; i++) {
@@ -127,7 +123,6 @@
       }
     }
 
-    // Mostrar banner de premio al llegar a 5
     const banner = document.getElementById('reward-banner');
     if (estrellas >= 5) {
       banner.classList.remove('hidden');
@@ -165,7 +160,6 @@
     if (!clienteActual) return;
 
     try {
-      // Reiniciar estrellas a 0 tras canjear
       const { data, error } = await supabase
         .from('clientes')
         .update({ estrellas: 0 })
