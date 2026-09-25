@@ -7,7 +7,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#4F46E5">
   
-  <!-- Cargar Tailwind CSS para los estilos -->
+  <!-- Cargar Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- Cargar SDK de Supabase -->
@@ -26,7 +26,7 @@
     <div id="login-section" class="space-y-4">
       <h2 class="text-lg font-semibold text-gray-700">Ingresa tu Celular</h2>
       <input id="phone-input" type="tel" placeholder="Ej: 987654321" class="w-full p-3 border border-gray-300 rounded-xl text-center font-bold text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-      <button onclick="buscarOBuscarCliente()" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl shadow-md hover:bg-indigo-700 transition">
+      <button id="btn-entrar" onclick="buscarOBuscarCliente()" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl shadow-md hover:bg-indigo-700 transition">
         Entrar / Consultar Puntos
       </button>
     </div>
@@ -59,18 +59,28 @@
   </section>
 
 <script>
-  // --- CONFIGURACIÓN DE SUPABASE (URL Y KEY COINCIDENTES) ---
   const SUPABASE_URL = 'https://rkrtcsezfxmxnrxwgtgd.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrcnRjc2V6ZnhteG5yeHdndGdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMTA5ODcsImV4cCI6MjA0MjY2MzAwOX0.3HTK3ddlnVdHcnaMYr3g4vlpWvNd9gkGyn04rrCLDuA';
   
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  let supabase = null;
+  if (window.supabase) {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
 
   let clienteActual = null;
 
   async function buscarOBuscarCliente() {
+    if (!supabase) {
+      return alert('Error: No se pudo cargar la librería de Supabase. Revisa tu conexión.');
+    }
+
     const telInput = document.getElementById('phone-input');
     const tel = telInput.value.trim();
     if (!tel) return alert('Ingresa un número de celular');
+
+    const btn = document.getElementById('btn-entrar');
+    btn.disabled = true;
+    btn.textContent = 'Cargando...';
 
     try {
       // 1. Buscar si el cliente existe
@@ -98,8 +108,11 @@
       mostrarTarjeta();
 
     } catch (err) {
-      console.error(err);
-      alert('Error de conexión a la base de datos: ' + err.message);
+      console.error('Detalle del error:', err);
+      alert('Error de conexión o estructura en Supabase:\n' + (err.message || JSON.stringify(err)));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Entrar / Consultar Puntos';
     }
   }
 
@@ -154,7 +167,7 @@
       actualizarVistaEstrellas();
       alert(`¡+1 Estrella agregada a ${clienteActual.telefono}!`);
     } catch (err) {
-      alert('Error al actualizar estrellas: ' + err.message);
+      alert('Error al actualizar estrellas:\n' + (err.message || JSON.stringify(err)));
     }
   }
 
@@ -175,7 +188,7 @@
       actualizarVistaEstrellas();
       alert('🎉 ¡Premio canjeado con éxito! La tarjeta se ha reiniciado.');
     } catch (err) {
-      alert('Error al canjear premio: ' + err.message);
+      alert('Error al canjear premio:\n' + (err.message || JSON.stringify(err)));
     }
   }
 
