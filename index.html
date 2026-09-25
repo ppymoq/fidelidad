@@ -7,76 +7,53 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#4F46E5">
   
-  <!-- SDK de Supabase -->
+  <!-- Cargar Tailwind CSS para los estilos y colores -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Cargar SDK de Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
-    body { background-color: #f3f4f6; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 16px; }
-    header { width: 100%; max-width: 400px; background-color: #4f46e5; color: white; padding: 16px; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-    header h1 { font-size: 1.5rem; font-weight: bold; }
-    header p { font-size: 0.75rem; color: #c7d2fe; }
-    main { width: 100%; max-width: 400px; background-color: white; border-radius: 24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); padding: 24px; margin: auto 0; text-align: center; border: 1px solid #f3f4f6; }
-    .space-y-4 > * + * { margin-top: 16px; }
-    h2 { font-size: 1.125rem; font-weight: 600; color: #374151; }
-    input[type="tel"] { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 12px; text-align: center; font-weight: bold; font-size: 1.125rem; outline: none; }
-    input[type="tel"]:focus { border-color: #4f46e5; ring: 2px #4f46e5; }
-    .btn-primary { width: 100%; background-color: #4f46e5; color: white; font-weight: 600; padding: 12px; border-radius: 12px; border: none; cursor: pointer; font-size: 1rem; }
-    .btn-primary:hover { background-color: #4338ca; }
-    .hidden { display: none !important; }
-    .stars { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; font-size: 2.25rem; }
-    .star-filled { color: #facc15; }
-    .star-empty { color: #d1d5db; }
-    .reward-banner { background-color: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 16px; border-radius: 16px; margin-bottom: 16px; }
-    .reward-banner p.title { font-weight: bold; }
-    .reward-banner p.sub { font-size: 0.75rem; }
-    .btn-success { margin-top: 12px; background-color: #16a34a; color: white; font-weight: 600; padding: 8px 24px; border-radius: 12px; border: none; cursor: pointer; }
-    .text-status { font-size: 0.875rem; font-weight: 500; color: #4f46e5; }
-    .btn-link { margin-top: 16px; font-size: 0.75rem; color: #9ca3af; text-decoration: underline; background: none; border: none; cursor: pointer; display: block; margin-left: auto; margin-right: auto; }
-    section.admin { width: 100%; max-width: 400px; background-color: #111827; color: white; padding: 16px; border-radius: 16px; text-align: center; margin-bottom: 8px; }
-    section.admin p { font-size: 0.75rem; color: #9ca3af; font-family: monospace; margin-bottom: 8px; }
-    .btn-warning { background-color: #eab308; color: black; font-weight: bold; padding: 8px 16px; border-radius: 12px; font-size: 0.875rem; border: none; cursor: pointer; }
-    .btn-warning:hover { background-color: #ca8a04; }
-  </style>
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-between p-4 font-sans">
 
-  <header>
-    <h1>Mi Negocio ⭐</h1>
-    <p>Tarjeta Digital de Puntos</p>
+  <header class="w-full max-w-md bg-indigo-600 text-white p-4 rounded-b-2xl shadow-lg text-center">
+    <h1 class="text-2xl font-bold">Mi Negocio ⭐</h1>
+    <p class="text-xs text-indigo-200">Tarjeta Digital de Puntos</p>
   </header>
 
-  <main>
+  <main class="w-full max-w-md bg-white rounded-3xl shadow-xl p-6 my-auto text-center border border-gray-100">
+    
     <!-- Login / Registro por Teléfono -->
     <div id="login-section" class="space-y-4">
-      <h2>Ingresa tu Celular</h2>
-      <input id="phone-input" type="tel" placeholder="Ej: 987654321">
-      <button onclick="buscarOBuscarCliente()" class="btn-primary">
+      <h2 class="text-lg font-semibold text-gray-700">Ingresa tu Celular</h2>
+      <input id="phone-input" type="tel" placeholder="Ej: 987654321" class="w-full p-3 border border-gray-300 rounded-xl text-center font-bold text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      <button onclick="buscarOBuscarCliente()" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl shadow-md hover:bg-indigo-700 transition">
         Entrar / Consultar Puntos
       </button>
     </div>
 
     <!-- Vista de Estrellas -->
     <div id="card-section" class="hidden">
-      <p style="font-size: 0.75rem; color: #9ca3af; font-family: monospace; margin-bottom: 4px;" id="user-phone"></p>
+      <p class="text-xs text-gray-400 font-mono mb-1" id="user-phone"></p>
       
-      <div id="stars-container" class="stars"></div>
+      <!-- Contenedor visual de las estrellas -->
+      <div id="stars-container" class="flex justify-center gap-2 mb-6 text-3xl"></div>
 
-      <div id="reward-banner" class="reward-banner hidden">
-        <p class="title">🎉 ¡Ganaste un Premio!</p>
-        <p class="sub">Muestra esta pantalla en caja para canjearlo.</p>
-        <button onclick="canjearPremio()" class="btn-success">Canjear</button>
+      <div id="reward-banner" class="hidden bg-green-100 border border-green-300 text-green-800 p-4 rounded-2xl mb-4 animate-bounce">
+        <p class="font-bold">🎉 ¡Ganaste un Premio!</p>
+        <p class="text-xs">Muestra esta pantalla en caja para canjearlo.</p>
+        <button onclick="canjearPremio()" class="mt-3 bg-green-600 text-white font-semibold py-2 px-6 rounded-xl hover:bg-green-700">Canjear</button>
       </div>
 
-      <p class="text-status">Llevas <span id="star-count">0</span>/5 estrellas</p>
-      <button onclick="cerrarSesion()" class="btn-link">Cambiar de número</button>
+      <p class="text-sm font-medium text-indigo-600">Llevas <span id="star-count">0</span>/5 estrellas</p>
+      <button onclick="cerrarSesion()" class="mt-4 text-xs text-gray-400 underline block mx-auto">Cambiar de número</button>
     </div>
+
   </main>
 
-  <!-- Panel Admin (Caja) -->
-  <section class="admin">
-    <p>--- CAJA / ADMIN ---</p>
-    <button onclick="marcarConsumoAdmin()" class="btn-warning">
+  <!-- Panel Admin (Para marcar estrellas en la caja) -->
+  <section class="w-full max-w-md bg-gray-900 text-white p-4 rounded-2xl text-center mb-2">
+    <p class="text-xs text-gray-400 font-mono mb-2">--- CAJA / ADMIN ---</p>
+    <button onclick="marcarConsumoAdmin()" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded-xl text-sm transition">
       +1 Estrella a este Cliente
     </button>
   </section>
@@ -84,7 +61,8 @@
 <script>
   // --- CONFIGURACIÓN DE SUPABASE ---
   const SUPABASE_URL = 'https://tencujhgrbzruxikqljq.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrcnRjc2V6ZnhteG5yeHdndGdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMTA5ODcsImV4cCI6MjEwNTg4Njk4N30.3HTK3ddlnVdHcnaMYr3g4vlpWvNd9gkGyn04rrCLDuA'; // Pega aquí tu clave anon public completa
+  // IMPORTANTE: Asegúrate de pegar aquí la llave anon public COMPLETA de tu panel de Supabase
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlbmN1amhncmJ6cnV4aWtxbGpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjcwODcwMDksImV4cCI6MjA0MjY2MzAwOX0.S0o0_G8...';
   
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -96,6 +74,7 @@
     if (!tel) return alert('Ingresa un número de celular');
 
     try {
+      // 1. Buscar si el cliente existe
       let { data, error } = await supabase
         .from('clientes')
         .select('*')
@@ -104,6 +83,7 @@
 
       if (error) throw error;
 
+      // 2. Si no existe, crearlo
       if (!data) {
         const { data: nuevo, error: createError } = await supabase
           .from('clientes')
@@ -128,6 +108,7 @@
     document.getElementById('login-section').classList.add('hidden');
     document.getElementById('card-section').classList.remove('hidden');
     document.getElementById('user-phone').textContent = `Cliente: ${clienteActual.telefono}`;
+    
     actualizarVistaEstrellas();
   }
 
@@ -135,16 +116,18 @@
     const estrellas = clienteActual.estrellas || 0;
     document.getElementById('star-count').textContent = estrellas;
 
+    // Renderizar iconos de estrellas (llenas / vacías)
     const container = document.getElementById('stars-container');
     container.innerHTML = '';
     for (let i = 1; i <= 5; i++) {
       if (i <= estrellas) {
-        container.innerHTML += '<span class="star-filled">★</span>';
+        container.innerHTML += '<span class="text-yellow-400">★</span>';
       } else {
-        container.innerHTML += '<span class="star-empty">☆</span>';
+        container.innerHTML += '<span class="text-gray-300">☆</span>';
       }
     }
 
+    // Mostrar banner de premio al llegar a 5
     const banner = document.getElementById('reward-banner');
     if (estrellas >= 5) {
       banner.classList.remove('hidden');
@@ -182,6 +165,7 @@
     if (!clienteActual) return;
 
     try {
+      // Reiniciar estrellas a 0 tras canjear
       const { data, error } = await supabase
         .from('clientes')
         .update({ estrellas: 0 })
@@ -193,7 +177,7 @@
 
       clienteActual = data;
       actualizarVistaEstrellas();
-      alert('🎉 ¡Premio canjeado con éxito!');
+      alert('🎉 ¡Premio canjeado con éxito! La tarjeta se ha reiniciado.');
     } catch (err) {
       alert('Error al canjear premio: ' + err.message);
     }
