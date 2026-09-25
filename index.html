@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puntos de Fidelidad</title>
+
+  <!-- PWA Manifest & Theme -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4F46E5">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1828/1828884.png">
+
+  <!-- Tailwind CSS para diseño moderno -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-between font-sans p-4">
+
+  <!-- Header -->
+  <header class="w-full max-w-md bg-indigo-600 text-white p-4 rounded-b-2xl shadow-lg text-center">
+    <h1 class="text-2xl font-bold">Mi Negocio ⭐</h1>
+    <p class="text-xs text-indigo-200 mt-1">Programa de Fidelidad</p>
+  </header>
+
+  <!-- Tarjeta de Fidelidad del Cliente -->
+  <main class="w-full max-w-md bg-white rounded-3xl shadow-xl p-6 my-auto text-center border border-gray-100">
+    <h2 class="text-lg font-semibold text-gray-700">Tu Tarjeta de Puntos</h2>
+    <p class="text-sm text-gray-500 mb-6">Completa 5 estrellas y reclama tu premio</p>
+
+    <!-- Contenedor de Estrellas -->
+    <div id="stars-container" class="flex justify-center gap-2 mb-6">
+      <!-- Las estrellas se generan dinámicamente con JS -->
+    </div>
+
+    <!-- Estado del Premio -->
+    <div id="reward-banner" class="hidden bg-green-100 border border-green-300 text-green-800 p-4 rounded-2xl mb-6 animate-bounce">
+      <p class="font-bold text-lg">🎉 ¡Felicidades!</p>
+      <p class="text-xs">Has completado las 5 estrellas. Reclama tu premio en caja.</p>
+      <button onclick="canjearPremio()" class="mt-3 bg-green-600 text-white font-semibold py-2 px-6 rounded-xl hover:bg-green-700 transition">
+        Canjear Premio
+      </button>
+    </div>
+
+    <div id="status-text" class="text-sm font-medium text-indigo-600">
+      Llevas <span id="star-count">0</span> de 5 estrellas
+    </div>
+  </main>
+
+  <!-- Panel de Control del Negocio (Simulación para el dueño) -->
+  <section class="w-full max-w-md bg-gray-900 text-white p-4 rounded-2xl shadow-lg text-center mb-4">
+    <p class="text-xs text-gray-400 font-mono mb-2">--- PANEL DEL NEGOCIO (Solo Admin) ---</p>
+    <div class="flex gap-2 justify-center">
+      <button onclick="marcarConsumo()" class="bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold py-2 px-4 rounded-xl transition">
+        +1 Estrella (Consumo)
+      </button>
+      <button onclick="reiniciarPuntos()" class="bg-red-500 hover:bg-red-600 text-white text-xs py-2 px-3 rounded-xl transition">
+        Reiniciar
+      </button>
+    </div>
+  </section>
+
+  <!-- Código JavaScript de la PWA -->
+  <script>
+    const MAX_STARS = 5;
+    let currentStars = parseInt(localStorage.getItem('user_stars')) || 0;
+
+    function renderStars() {
+      const container = document.getElementById('stars-container');
+      const countLabel = document.getElementById('star-count');
+      const rewardBanner = document.getElementById('reward-banner');
+
+      container.innerHTML = '';
+      countLabel.textContent = currentStars;
+
+      for (let i = 1; i <= MAX_STARS; i++) {
+        const isFilled = i <= currentStars;
+        const star = document.createElement('span');
+        star.className = `text-4xl transition-all duration-300 transform ${isFilled ? 'scale-110 text-yellow-400' : 'text-gray-300'}`;
+        star.innerHTML = '★';
+        container.appendChild(star);
+      }
+
+      if (currentStars >= MAX_STARS) {
+        rewardBanner.classList.remove('hidden');
+      } else {
+        rewardBanner.classList.add('hidden');
+      }
+    }
+
+    function marcarConsumo() {
+      if (currentStars < MAX_STARS) {
+        currentStars++;
+        localStorage.setItem('user_stars', currentStars);
+        renderStars();
+      }
+    }
+
+    function canjearPremio() {
+      alert('¡Premio canjeado con éxito! Tus estrellas se reiniciarán a 0.');
+      reiniciarPuntos();
+    }
+
+    function reiniciarPuntos() {
+      currentStars = 0;
+      localStorage.setItem('user_stars', 0);
+      renderStars();
+    }
+
+    // Inicializar visualización al cargar
+    renderStars();
+
+    // Registro del Service Worker para soporte PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('Service Worker Registrado'))
+        .catch(err => console.error('Error en Service Worker:', err));
+    }
+  </script>
+</body>
+</html>
