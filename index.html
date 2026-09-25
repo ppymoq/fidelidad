@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fidelidad Mi Negocio</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#4F46E5">
-  
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SDK de Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-between p-4 font-sans">
@@ -19,16 +17,14 @@
 
   <main class="w-full max-w-md bg-white rounded-3xl shadow-xl p-6 my-auto text-center border border-gray-100">
     
-    <!-- Login / Registro por Teléfono -->
     <div id="login-section" class="space-y-4">
       <h2 class="text-lg font-semibold text-gray-700">Ingresa tu Celular</h2>
       <input id="phone-input" type="tel" placeholder="Ej: 987654321" class="w-full p-3 border border-gray-300 rounded-xl text-center font-bold text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-      <button id="btn-entrar" type="button" onclick="buscarOBuscarCliente()" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl shadow-md hover:bg-indigo-700 transition">
+      <button id="btn-entrar" onclick="buscarOBuscarCliente()" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl shadow-md hover:bg-indigo-700 transition">
         Entrar / Consultar Puntos
       </button>
     </div>
 
-    <!-- Vista de Estrellas -->
     <div id="card-section" class="hidden">
       <p class="text-xs text-gray-400 font-mono mb-1" id="user-phone"></p>
       
@@ -46,7 +42,6 @@
 
   </main>
 
-  <!-- Panel Admin (Caja) -->
   <section class="w-full max-w-md bg-gray-900 text-white p-4 rounded-2xl text-center mb-2">
     <p class="text-xs text-gray-400 font-mono mb-2">--- CAJA / ADMIN ---</p>
     <button onclick="marcarConsumoAdmin()" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded-xl text-sm transition">
@@ -56,12 +51,20 @@
 
 <script>
   const SUPABASE_URL = 'https://rkrtcsezfxmxnrxwgtgd.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrcnRjc2V6ZnhteG5yeHdndGdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMTA5ODcsImV4cCI6MjEwNTg4Njk4N30.3HTK3ddlnVdHcnaMYr3g4vlpWvNd9gkGyn04rrCLDuA';
   
-  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // PEGA AQUÍ LA CLAVE QUE COPIES DE LA PESTAÑA "Publishable and secret API keys"
+  const SUPABASE_KEY = 'PEGA_AQUI_TU_CLAVE_PUBLISHABLE'; 
+
+  let db = null;
+  if (window.supabase) {
+    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+
   let clienteActual = null;
 
   async function buscarOBuscarCliente() {
+    if (!db) return alert('No se pudo cargar la librería de Supabase.');
+
     const telInput = document.getElementById('phone-input');
     const tel = telInput.value.trim();
     if (!tel) return alert('Ingresa un número de celular');
@@ -71,7 +74,6 @@
     btn.textContent = 'Verificando...';
 
     try {
-      // 1. Buscar el número
       let { data, error } = await db
         .from('clientes')
         .select('*')
@@ -79,7 +81,6 @@
 
       if (error) throw error;
 
-      // 2. Crear si no existe
       if (!data || data.length === 0) {
         const { data: nuevoCliente, error: insertError } = await db
           .from('clientes')
