@@ -3,12 +3,12 @@
   "name": "Broastería PoPeYe - Tarjeta de Puntos",
   "icons": [
     {
-      "src": "LOGO FINAL.png",
+      "src": "LOGO_FINAL.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo.png",
+      "src": "LOGO_FINAL.png",
       "type": "image/png",
       "sizes": "512x512"
     }
