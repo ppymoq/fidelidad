@@ -84,9 +84,7 @@
     let clienteActual = null;
     let esRegistroNuevo = false;
 
-
-
-    
+   
     async function procesarCliente() {
         const phoneInput = document.getElementById('input-phone');
         const btn = document.getElementById('btn-login');
@@ -173,10 +171,9 @@
           btn.disabled = false;
           if (!esRegistroNuevo) btn.textContent = 'Consultar / Entrar';
         }
-       }
-
-
+    }
     
+
     function mostrarTarjeta() {
       document.getElementById('login-section').classList.add('hidden');
       document.getElementById('card-section').classList.remove('hidden');
