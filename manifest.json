@@ -1,21 +1,20 @@
 {
-  "name": "Fidelidad Mi Negocio",
-  "short_name": "Fidelidad",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#4F46E5",
-  "theme_color": "#4F46E5",
-  "orientation": "portrait",
+  "short_name": "PoPeYe",
+  "name": "Broastería PoPeYe - Tarjeta de Puntos",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1828/1828884.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "LOGO FINAL.png",
+      "type": "image/png",
+      "sizes": "192x192"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1828/1828884.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "logo.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
-  ]
+  ],
+  "start_url": "./index.html",
+  "background_color": "#4F46E5",
+  "theme_color": "#4F46E5",
+  "display": "standalone"
 }
