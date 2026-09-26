@@ -4,27 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Broastería PoPeYe - Fidelidad</title>
-  
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" href="LOGO_FINAL.png">
-  <link rel="apple-touch-icon" href="LOGO_FINAL.png">
-  <meta name="theme-color" content="#4F46E5">
-  
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-between p-4 font-sans">
+<body class="bg-slate-100 min-h-screen flex flex-col items-center p-4">
 
-  <!-- Encabezado de la Marca -->
-  <header class="w-full max-w-md bg-indigo-600 text-white p-6 rounded-b-3xl shadow-xl text-center flex flex-col items-center justify-center">
+  <!-- Encabezado -->
+  <header class="w-full max-w-md bg-indigo-600 text-white p-6 rounded-b-3xl shadow-xl text-center flex flex-col items-center justify-center mb-6">
     <div class="bg-white p-2 rounded-full shadow-md mb-3 flex items-center justify-center w-20 h-20">
       <img src="LOGO_FINAL.png" alt="Logo Broastería PoPeYe" class="w-full h-full object-contain rounded-full">
     </div>
-    
     <h1 class="text-2xl font-extrabold tracking-wide flex items-center gap-2 justify-center">
       Broastería PoPeYe 🍗
     </h1>
-    
     <p class="text-xs text-indigo-100 font-medium mt-2 leading-relaxed max-w-xs">
       ¡Porque te mereces lo mejor, premiamos tu preferencia en cada compra!
     </p>
@@ -33,235 +26,171 @@
     </p>
   </header>
 
-  <!-- Contenido Principal -->
-  <main class="w-full max-w-md bg-white rounded-3xl shadow-xl p-6 my-auto text-center border border-gray-100">
+  <!-- Contenedor Principal -->
+  <main class="w-full max-w-md">
     
-    <!-- Login / Registro -->
-    <div id="login-section" class="space-y-4">
-      <h2 class="text-lg font-semibold text-gray-700">Ingresa tu Celular</h2>
+    <!-- Formulario de Login / Registro -->
+    <section id="login-section" class="bg-white p-6 rounded-3xl shadow-lg text-center border border-gray-100">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">Ingresa tu Celular</h2>
       
-      <!-- Paso 1: Ingreso de Celular -->
-      <input id="phone-input" type="tel" placeholder="Número Celular (Ej: 987654321)" class="w-full p-3 border border-gray-300 rounded-xl text-center font-bold text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-      
-      <!-- Paso 2: Datos Adicionales (Solo visibles al registrarse por 1ª vez) -->
-      <div id="new-user-fields" class="hidden space-y-3 pt-2 border-t border-gray-100">
-        <p class="text-xs font-medium text-indigo-600">¡Eres nuevo! Completa tus datos por única vez:</p>
-        
-        <input id="name-input" type="text" placeholder="Tu Nombre y Apellido" class="w-full p-3 border border-gray-300 rounded-xl text-center font-semibold text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        
-        <div class="text-left">
-          <label class="text-xs text-gray-500 font-medium ml-1">Fecha de Nacimiento:</label>
-          <input id="dob-input" type="date" class="w-full p-3 border border-gray-300 rounded-xl text-center font-semibold text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      <div class="space-y-4">
+        <div>
+          <input type="tel" id="input-phone" placeholder="Número Celular (Ej: 987654321)" class="w-full p-3 border border-gray-300 rounded-xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
+
+        <div id="fields-new-user" class="hidden space-y-4">
+          <input type="text" id="input-name" placeholder="Tu Nombre" class="w-full p-3 border border-gray-300 rounded-xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Fecha de Nacimiento (Opcional)</label>
+            <input type="date" id="input-dob" class="w-full p-3 border border-gray-300 rounded-xl text-center text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+
+        <button id="btn-login" onclick="procesarCliente()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition duration-200">
+          Entrar / Consultar Puntos
+        </button>
+      </div>
+    </section>
+
+    <!-- Tarjeta de Puntos -->
+    <section id="card-section" class="hidden bg-white p-6 rounded-3xl shadow-lg text-center border border-gray-100">
+      <h2 id="user-name" class="text-2xl font-bold text-gray-800 mb-1">¡Hola!</h2>
+      <p id="user-phone" class="text-sm text-gray-400 font-mono mb-6">Celular: ---</p>
+
+      <!-- Contenedor de Logos (Logos acumulados) -->
+      <div id="stars-container" class="flex justify-center items-center gap-2 mb-4">
+        <!-- Generado dinámicamente -->
       </div>
 
-      <button id="btn-entrar" onclick="procesarIngreso()" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl shadow-md hover:bg-indigo-700 transition">
-        Entrar / Consultar Puntos
+      <p class="text-indigo-600 font-medium mb-6">Llevas <span id="star-count">0</span>/5 PPY</p>
+
+      <div id="reward-banner" class="hidden bg-yellow-100 border border-yellow-400 text-yellow-800 p-3 rounded-2xl mb-4 text-sm font-bold animate-pulse">
+        🎉 ¡Felicidades! Tienes un premio listo para canjear en tu próxima compra.
+      </div>
+
+      <button onclick="cambiarUsuario()" class="text-xs text-gray-400 underline hover:text-gray-600">
+        Cambiar de usuario
       </button>
-    </div>
-
-    <!-- Vista de la Tarjeta Digital -->
-    <div id="card-section" class="hidden">
-      <h2 class="text-xl font-bold text-gray-800 mb-1" id="user-name">¡Hola, Cliente!</h2>
-      <p class="text-xs text-gray-400 font-mono mb-4" id="user-phone"></p>
-      
-      <!-- Contenedor de Puntos / Estrellas -->
-      <div id="stars-container" class="flex justify-center gap-2 mb-6 text-3xl"></div>
-
-      <!-- Banner de Recompensa -->
-      <div id="reward-banner" class="hidden bg-green-100 border border-green-300 text-green-800 p-4 rounded-2xl mb-4">
-        <p class="font-bold">🎉 ¡Ganaste un Premio!</p>
-        <p class="text-xs">Muestra esta pantalla en caja para canjearlo.</p>
-        <button onclick="canjearPremio()" class="mt-3 bg-green-600 text-white font-semibold py-2 px-6 rounded-xl hover:bg-green-700">Canjear</button>
-      </div>
-
-      <p class="text-sm font-medium text-indigo-600">Llevas <span id="star-count">0</span>/5 estrellas</p>
-      <button onclick="cerrarSesion()" class="mt-4 text-xs text-gray-400 underline block mx-auto">Cambiar de usuario</button>
-    </div>
+    </section>
 
   </main>
 
-  
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(err => console.log('Error SW:', err));
-  }
+  <script>
+    // Configuración Supabase
+    const SUPABASE_URL = 'https://TU-PROYECTO.supabase.co'; // Reemplazar con tu URL de Supabase
+    const SUPABASE_ANON_KEY = 'TU-ANON-KEY'; // Reemplazar con tu ANON_KEY de Supabase
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const SUPABASE_URL = 'https://rkrtcsezfxmxnrxwgtgd.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrcnRjc2V6ZnhteG5yeHdndGdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMTA5ODcsImV4cCI6MjEwNTg4Njk4N30.3HTK3ddlnVdHcnaMYr3g4vlpWvNd9gkGyn04rrCLDuA';
+    let clienteActual = null;
+    let esRegistroNuevo = false;
 
-  let db = null;
-  if (window.supabase) {
-    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
+    async function procesarCliente() {
+      const phoneInput = document.getElementById('input-phone').value.trim();
+      const btn = document.getElementById('btn-login');
 
-  let clienteActual = null;
-  let esRegistroNuevo = false;
+      if (!phoneInput) {
+        alert('Por favor ingresa un número de celular');
+        return;
+      }
 
-  async function procesarIngreso() {
-    if (!db) return alert('No se pudo conectar con la base de datos.');
+      btn.disabled = true;
+      btn.textContent = 'Cargando...';
 
-    const telInput = document.getElementById('phone-input');
-    const nameInput = document.getElementById('name-input');
-    const dobInput = document.getElementById('dob-input');
-    const newUserFields = document.getElementById('new-user-fields');
-    const btn = document.getElementById('btn-entrar');
+      try {
+        if (!esRegistroNuevo) {
+          // Buscar cliente por teléfono
+          const { data, error } = await _supabase
+            .from('clientes')
+            .select('*')
+            .eq('telefono', phoneInput)
+            .maybeSingle();
 
-    const tel = telInput.value.trim();
-    if (!tel) return alert('Ingresa tu número de celular');
+          if (error) throw error;
 
-    btn.disabled = true;
-
-    try {
-      // 1. Si no hemos detectado si es nuevo, consultamos a Supabase
-      if (!esRegistroNuevo) {
-        btn.textContent = 'Verificando...';
-        
-        let { data, error } = await db
-          .from('clientes')
-          .select('*')
-          .eq('telefono', tel);
-
-        if (error) throw error;
-
-        if (data && data.length > 0) {
-          // El cliente YA existe -> ingresar directo
-          clienteActual = data[0];
-          mostrarTarjeta();
-          return;
+          if (data) {
+            clienteActual = data;
+            mostrarTarjeta();
+          } else {
+            // No existe, mostrar campos de registro
+            esRegistroNuevo = true;
+            document.getElementById('fields-new-user').classList.remove('hidden');
+            btn.textContent = 'Completar Registro';
+          }
         } else {
-          // El cliente NO existe -> Desplegar campos para registro único
-          esRegistroNuevo = true;
-          newUserFields.classList.remove('hidden');
-          btn.textContent = 'Completar Registro';
-          alert('¡Bienvenido! Es tu primera vez. Por favor ingresa tu nombre y fecha de nacimiento.');
-          return;
+          // Crear nuevo cliente
+          const nameInput = document.getElementById('input-name').value.trim();
+          const dobInput = document.getElementById('input-dob').value;
+
+          if (!nameInput) {
+            alert('Por favor ingresa tu nombre');
+            return;
+          }
+
+          const { data, error } = await _supabase
+            .from('clientes')
+            .insert([{
+              telefono: phoneInput,
+              nombre: nameInput,
+              fecha_nacimiento: dobInput || null,
+              estrellas: 0
+            }])
+            .select()
+            .single();
+
+          if (error) throw error;
+
+          clienteActual = data;
+          mostrarTarjeta();
+        }
+      } catch (err) {
+        alert('Error: ' + (err.message || JSON.stringify(err)));
+      } finally {
+        btn.disabled = false;
+        if (!esRegistroNuevo) btn.textContent = 'Entrar / Consultar Puntos';
+      }
+    }
+
+    function mostrarTarjeta() {
+      document.getElementById('login-section').classList.add('hidden');
+      document.getElementById('card-section').classList.remove('hidden');
+
+      document.getElementById('user-name').textContent = clienteActual.nombre ? `¡Hola, ${clienteActual.nombre}!` : '¡Bienvenido!';
+      document.getElementById('user-phone').textContent = `Celular: ${clienteActual.telefono}`;
+
+      actualizarVistaEstrellas();
+    }
+
+    function actualizarVistaEstrellas() {
+      const estrellas = clienteActual.estrellas || 0;
+      document.getElementById('star-count').textContent = estrellas;
+
+      const container = document.getElementById('stars-container');
+      container.innerHTML = '';
+
+      for (let i = 1; i <= 5; i++) {
+        if (i <= estrellas) {
+          container.innerHTML += '<img src="LOGO_FINAL.png" class="w-10 h-10 inline-block mx-1 object-contain">';
+        } else {
+          container.innerHTML += '<img src="LOGO_FINAL.png" class="w-10 h-10 inline-block mx-1 object-contain opacity-25 grayscale">';
         }
       }
 
-      // 2. Si ya desplegó los campos y presiona el botón para completar registro
-      const nombre = nameInput.value.trim();
-      const dob = dobInput.value;
-
-      if (!nombre) return alert('Ingresa tu nombre para continuar.');
-      if (!dob) return alert('Por favor selecciona tu fecha de nacimiento.');
-
-      btn.textContent = 'Registrando...';
-
-      const { data: nuevoCliente, error: insertError } = await db
-        .from('clientes')
-        .insert([{ 
-          telefono: tel, 
-          nombre: nombre, 
-          fecha_nacimiento: dob, 
-          estrellas: 0 
-        }])
-        .select();
-
-      if (insertError) throw insertError;
-
-      clienteActual = nuevoCliente[0];
-      mostrarTarjeta();
-
-    } catch (err) {
-      alert('Error: ' + (err.message || JSON.stringify(err)));
-    } finally {
-      btn.disabled = false;
-      if (!esRegistroNuevo) btn.textContent = 'Entrar / Consultar Puntos';
+      const banner = document.getElementById('reward-banner');
+      if (estrellas >= 5) banner.classList.remove('hidden');
+      else banner.classList.add('hidden');
     }
-  }
 
-  function mostrarTarjeta() {
-    document.getElementById('login-section').classList.add('hidden');
-    document.getElementById('card-section').classList.remove('hidden');
-    
-    document.getElementById('user-name').textContent = clienteActual.nombre ? `¡Hola, ${clienteActual.nombre}!` : '¡Bienvenido!';
-    document.getElementById('user-phone').textContent = `Celular: ${clienteActual.telefono}`;
-    
-    actualizarVistaEstrellas();
-  }
-
-  
-  function actualizarVistaEstrellas() {
-  const estrellas = clienteActual.estrellas || 0;
-  document.getElementById('star-count').textContent = estrellas;
-
-  const container = document.getElementById('stars-container');
-  container.innerHTML = '';
-
-  for (let i = 1; i <= 5; i++) {
-    if (i <= estrellas) {
-      container.innerHTML += '<img src="LOGO_FINAL.png" class="w-10 h-10 inline-block mx-1 object-contain">';
-    } else {
-      container.innerHTML += '<img src="LOGO_FINAL.png" class="w-10 h-10 inline-block mx-1 object-contain opacity-25 grayscale">';
+    function cambiarUsuario() {
+      clienteActual = null;
+      esRegistroNuevo = false;
+      document.getElementById('input-phone').value = '';
+      document.getElementById('input-name').value = '';
+      document.getElementById('input-dob').value = '';
+      document.getElementById('fields-new-user').classList.add('hidden');
+      document.getElementById('btn-login').textContent = 'Entrar / Consultar Puntos';
+      document.getElementById('card-section').classList.add('hidden');
+      document.getElementById('login-section').classList.remove('hidden');
     }
-  }
-
-  const banner = document.getElementById('reward-banner');
-  if (estrellas >= 5) banner.classList.remove('hidden');
-  else banner.classList.add('hidden');
-}
-
-    
-    const banner = document.getElementById('reward-banner');
-    if (estrellas >= 5) banner.classList.remove('hidden');
-    else banner.classList.add('hidden');
-  }
-
-    const banner = document.getElementById('reward-banner');
-    if (estrellas >= 5) banner.classList.remove('hidden');
-    else banner.classList.add('hidden');
-  }
-
-  async function marcarConsumoAdmin() {
-    if (!clienteActual) return alert('Ingresa primero el cliente.');
-
-    const nuevasEstrellas = (clienteActual.estrellas || 0) + 1;
-
-    try {
-      const { data, error } = await db
-        .from('clientes')
-        .update({ estrellas: nuevasEstrellas })
-        .eq('id', clienteActual.id)
-        .select();
-
-      if (error) throw error;
-      clienteActual = data[0];
-      actualizarVistaEstrellas();
-    } catch (err) {
-      alert('Error: ' + err.message);
-    }
-  }
-
-  async function canjearPremio() {
-    if (!clienteActual) return;
-    try {
-      const { data, error } = await db
-        .from('clientes')
-        .update({ estrellas: 0 })
-        .eq('id', clienteActual.id)
-        .select();
-
-      if (error) throw error;
-      clienteActual = data[0];
-      actualizarVistaEstrellas();
-      alert('🎉 Premio canjeado con éxito');
-    } catch (err) {
-      alert('Error: ' + err.message);
-    }
-  }
-
-  function cerrarSesion() {
-    clienteActual = null;
-    esRegistroNuevo = false;
-    document.getElementById('phone-input').value = '';
-    document.getElementById('name-input').value = '';
-    document.getElementById('dob-input').value = '';
-    document.getElementById('new-user-fields').classList.add('hidden');
-    document.getElementById('btn-entrar').textContent = 'Entrar / Consultar Puntos';
-    document.getElementById('card-section').classList.add('hidden');
-    document.getElementById('login-section').classList.remove('hidden');
-  }
-</script>
+  </script>
 </body>
 </html>
