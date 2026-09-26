@@ -84,72 +84,99 @@
     let clienteActual = null;
     let esRegistroNuevo = false;
 
+
+
+    
     async function procesarCliente() {
-      const phoneInput = document.getElementById('input-phone').value.trim();
-      const btn = document.getElementById('btn-login');
-
-      if (!phoneInput) {
-        alert('Por favor ingresa un número de celular');
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = 'Cargando...';
-
-      try {
-        if (!esRegistroNuevo) {
-          // Buscar cliente por teléfono
-          const { data, error } = await _supabase
-            .from('clientes')
-            .select('*')
-            .eq('telefono', phoneInput)
-            .maybeSingle();
-
-          if (error) throw error;
-
-          if (data) {
-            clienteActual = data;
-            mostrarTarjeta();
-          } else {
-            // No existe, mostrar campos de registro
-            esRegistroNuevo = true;
-            document.getElementById('fields-new-user').classList.remove('hidden');
-            btn.textContent = 'Completar Registro';
-          }
-        } else {
-          // Crear nuevo cliente
-          const nameInput = document.getElementById('input-name').value.trim();
-          const dobInput = document.getElementById('input-dob').value;
-
-          if (!nameInput) {
-            alert('Por favor ingresa tu nombre');
-            return;
-          }
-
-          const { data, error } = await _supabase
-            .from('clientes')
-            .insert([{
-              telefono: phoneInput,
-              nombre: nameInput,
-              fecha_nacimiento: dobInput || null,
-              estrellas: 0
-            }])
-            .select()
-            .single();
-
-          if (error) throw error;
-
-          clienteActual = data;
-          mostrarTarjeta();
+        const phoneInput = document.getElementById('input-phone');
+        const btn = document.getElementById('btn-login');
+        const newUserFields = document.getElementById('new-user-fields');
+        const tel = phoneInput.value.trim();
+    
+        if (!tel) {
+          alert('Por favor ingresa un número de celular');
+          return;
         }
-      } catch (err) {
-        alert('Error: ' + (err.message || JSON.stringify(err)));
-      } finally {
-        btn.disabled = false;
-        if (!esRegistroNuevo) btn.textContent = 'Entrar / Consultar Puntos';
-      }
-    }
+    
+        btn.disabled = true;
+    
+        try {
+          // 1. Verificar si el usuario ya existe en Supabase
+          if (!esRegistroNuevo) {
+            btn.textContent = 'Cargando...';
+    
+            let { data, error } = await _supabase
+              .from('clientes')
+              .select('*')
+              .eq('telefono', tel);
+    
+            if (error) throw error;
+    
+            if (data && data.length > 0) {
+              // El cliente YA existe -> Mostrar su tarjeta
+              clienteActual = data[0];
+              mostrarTarjeta();
+              return;
+            } else {
+              // El cliente NO existe -> Mostrar los campos y el mensaje de bienvenida
+              esRegistroNuevo = true;
+              
+              // Habilitar campos adicionales
+              newUserFields.classList.remove('hidden');
+              
+              // Crear o actualizar la caja de mensaje con el número en negrita
+              let welcomeMsg = document.getElementById('welcome-msg');
+              if (!welcomeMsg) {
+                welcomeMsg = document.createElement('div');
+                welcomeMsg.id = 'welcome-msg';
+                welcomeMsg.className = 'bg-indigo-50 border border-indigo-200 text-indigo-800 p-3 rounded-xl mb-4 text-sm text-center';
+                newUserFields.parentNode.insertBefore(welcomeMsg, newUserFields);
+              }
+    
+              welcomeMsg.innerHTML = `¡Bienvenido al número <strong class="font-extrabold text-indigo-900">${tel}</strong>! Por ser tu primera vez, ingresa tu nombre y fecha de nacimiento.`;
+              
+              btn.textContent = 'Completar Registro';
+              return;
+            }
+          }
+    
+          // 2. Si ya completó los datos y presiona "Completar Registro"
+          const nameInput = document.getElementById('input-name');
+          const dobInput = document.getElementById('input-dob');
+    
+          const nombre = nameInput ? nameInput.value.trim() : '';
+          const dob = dobInput ? dobInput.value : '';
+    
+          if (!nombre) return alert('Ingresa tu nombre para continuar.');
+          if (!dob) return alert('Por favor selecciona tu fecha de nacimiento.');
+    
+          btn.textContent = 'Registrando...';
+    
+          const { data: nuevoCliente, error: insertError } = await _supabase
+            .from('clientes')
+            .insert([{ 
+              telefono: tel, 
+              nombre: nombre, 
+              fecha_nacimiento: dob, 
+              estrellas: 0 
+            }])
+            .select();
+    
+          if (insertError) throw insertError;
+    
+          clienteActual = nuevoCliente[0];
+          mostrarTarjeta();
+    
+        } catch (err) {
+          alert('Error: ' + (err.message || JSON.stringify(err)));
+        } finally {
+          btn.disabled = false;
+          if (!esRegistroNuevo) btn.textContent = 'Consultar / Entrar';
+        }
+       }
 
+
+    
     function mostrarTarjeta() {
       document.getElementById('login-section').classList.add('hidden');
       document.getElementById('card-section').classList.remove('hidden');
