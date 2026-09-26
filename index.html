@@ -183,21 +183,24 @@
 
   
   function actualizarVistaEstrellas() {
-    const estrellas = clienteActual.estrellas || 0;
-    document.getElementById('star-count').textContent = estrellas;
+  const estrellas = clienteActual.estrellas || 0;
+  document.getElementById('star-count').textContent = estrellas;
 
-    const container = document.getElementById('stars-container');
-    container.innerHTML = '';
-    
-    for (let i = 1; i <= 5; i++) {
-      if (i <= estrellas) {
-        // Logo a color cuando el cliente tiene el punto
-        container.innerHTML += '<img src="LOGO_FINAL.png" class="w-10 h-10 inline-block mx-1 object-contain">';
-      } else {
-        // Logo apagado (transparente) cuando todavía no lo gana
-        container.innerHTML += '<img src="LOGO_FINAL.png" class="w-10 h-10 inline-block mx-1 object-contain opacity-25 grayscale">';
-      }
+  const container = document.getElementById('stars-container');
+  container.innerHTML = '';
+
+  for (let i = 1; i <= 5; i++) {
+    if (i <= estrellas) {
+      container.innerHTML += '<img src="LOGO_FINAL.png" class="w-10 h-10 inline-block mx-1 object-contain">';
+    } else {
+      container.innerHTML += '<img src="LOGO_FINAL.png" class="w-10 h-10 inline-block mx-1 object-contain opacity-25 grayscale">';
     }
+  }
+
+  const banner = document.getElementById('reward-banner');
+  if (estrellas >= 5) banner.classList.remove('hidden');
+  else banner.classList.add('hidden');
+}
 
     
     const banner = document.getElementById('reward-banner');
